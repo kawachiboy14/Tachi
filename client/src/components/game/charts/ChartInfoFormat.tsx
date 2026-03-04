@@ -190,7 +190,7 @@ function ChartInfoMiddle({
 	const gameName =
 		game === "ongeki" ? "オンゲキ" : game === "maimaidx" ? "maimai" : gameConfig.name;
 	const formattedTitle = song.title
-		.replace(/([!?,]){4,}/g, (m) => m[0].repeat(3)) 
+		.replace(/([!?,]){4,}/gu, (m) => m[0].repeat(3))
 		.replace(/-/gu, " ");
 
 	let search = `${gameName} ${formattedTitle}`;
