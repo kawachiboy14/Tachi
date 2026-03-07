@@ -17,5 +17,5 @@ export default function SupportBanner({ user }: { user: UserDocument }) {
 		);
 	}
 
-	return <></>
+	return <></>;
 }
