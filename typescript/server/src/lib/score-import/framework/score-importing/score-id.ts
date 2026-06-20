@@ -11,6 +11,8 @@ import {
 
 import type { DryScore } from "../common/types";
 
+import { InvalidScoreFailure } from "../common/converter-failures";
+
 export const LEGACY_CHART_ID_LENGTH = 40;
 
 export function assertLegacyChartIDForScoreID(legacyChartID: string): void {
@@ -46,8 +48,15 @@ export function CreateScoreID(
 
 	for (const m of Object.keys(gameConfig.providedMetrics)) {
 		const metric = m as keyof MongoProvidedMetrics[V3Game];
+		const value = dryScore.scoreData[metric];
 
-		elements[metric] = dryScore.scoreData[metric];
+		if (value === undefined) {
+			throw new InvalidScoreFailure(
+				`Required metric '${metric}' is undefined in score data for game ${game}. The score may predate this metric being added.`,
+			);
+		}
+
+		elements[metric] = value;
 	}
 
 	// Also include optional metrics in the checksum if they should be

@@ -26,7 +26,7 @@ export async function GetKaiAuthGuaranteed(
 	const authDoc = await GetKaiAuth(userID, service);
 
 	if (!authDoc) {
-		log.error(`No authentication was stored for ${service}.`);
+		log.warn(`No authentication was stored for ${service}.`);
 		throw new ScoreImportFatalError(401, `No authentication was stored for ${service}.`);
 	}
 

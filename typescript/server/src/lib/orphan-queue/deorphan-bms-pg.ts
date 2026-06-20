@@ -10,6 +10,7 @@ import {
 	type ChartDocument,
 	CreateSongID,
 	type GameGroupFromGame,
+	GameToGameGroup,
 	type SongDocument,
 } from "tachi-common";
 
@@ -42,7 +43,13 @@ export async function DeorphanBmsIfInOrphanChartPg(
 
 	log.info(`Song ${songDoc.title} was unorphaned forcefully (Postgres).`);
 
-	const songLegacyId = await GetNextBmsPmsSongLegacyId("bms");
+	const gameGroup = GameToGameGroup(game);
+
+	if (gameGroup !== "bms" && gameGroup !== "pms") {
+		throw new Error(`DeorphanBmsIfInOrphanChartPg called with non-BMS/PMS game: ${game}`);
+	}
+
+	const songLegacyId = await GetNextBmsPmsSongLegacyId(gameGroup);
 	const songNewID = CreateSongID();
 
 	songDoc.id = songNewID;
@@ -60,7 +67,7 @@ export async function DeorphanBmsIfInOrphanChartPg(
 			.values({
 				id: songNewID,
 				legacy_id: songLegacyId,
-				game_group: "bms",
+				game_group: gameGroup,
 				title: songDoc.title,
 				artist: songDoc.artist,
 				search_terms: songDoc.searchTerms,

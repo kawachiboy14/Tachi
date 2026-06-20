@@ -153,6 +153,19 @@ export async function ImportIterableDatapoint<D, C>(
 		// if this isn't a converterFailure, it's just a general error.
 		// Some sort of internal issue?
 		if (!IsConverterFailure(err)) {
+			// rg-stats ThrowIf assertions produce plain Errors prefixed with
+			// "Invalid input," - these represent bad user data, not server bugs.
+			// This is a pretty dirty fix for this, but whatever.
+			if (err instanceof Error && err.message.startsWith("Invalid input,")) {
+				log.info({ err }, `rg-stats input assertion failed, treating as InvalidDatapoint.`);
+				return {
+					success: false,
+					type: "InvalidDatapoint",
+					message: err.message,
+					content: {},
+				};
+			}
+
 			log.error(
 				{
 					err,
